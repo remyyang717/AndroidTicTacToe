@@ -1,7 +1,17 @@
 package com.example.compoststudio.model
 
+
+data class Board(
+    val value: List<List<String>> = List(3) { List(3) { "" } },
+)
+
+data class BoardHistory(
+    val value: List<Board> = listOf(Board()),
+)
+
 data class GameState(
-    val board: List<List<String>> = List(3) { List(3) { "" } },
+    val currentBoard: Board = Board(),
     val currentPlayer: String = "X",
-    val winner: String? = null
+    val winner: String? = null,
+    val round: Int = 0,
 )

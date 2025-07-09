@@ -2,16 +2,21 @@ package com.example.compoststudio.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.compose.runtime.*
+import com.example.compoststudio.model.Board
 import com.example.compoststudio.model.GameState
+import com.example.compoststudio.model.BoardHistory
 
 class TicTacToeViewModel : ViewModel() {
 
     var gameState by mutableStateOf(GameState())
         private set
 
+    var boardHistory by mutableStateOf(BoardHistory())
+        private set
+
     fun makeMove(row: Int, col: Int) {
-        if (gameState.board[row][col] == "" && gameState.winner == null) {
-            val updatedBoard = gameState.board.mapIndexed { r, rowList ->
+        if (gameState.currentBoard.value[row][col] == "" && gameState.winner == null) {
+            val updatedBoard = gameState.currentBoard.value.mapIndexed { r, rowList ->
                 rowList.mapIndexed { c, cell ->
                     if (r == row && c == col) gameState.currentPlayer else cell
                 }
@@ -20,16 +25,60 @@ class TicTacToeViewModel : ViewModel() {
             val winner = checkWinner(updatedBoard)
             val nextPlayer = if (gameState.currentPlayer == "X") "O" else "X"
 
+            val trimmedBoardHistory = if (gameState.round < boardHistory.value.count()) {
+                boardHistory.value.slice(0..gameState.round)
+            } else {
+                boardHistory.value
+            }
+
             gameState = gameState.copy(
-                board = updatedBoard,
+                currentBoard = Board(updatedBoard),
                 winner = winner,
-                currentPlayer = if (winner == null) nextPlayer else gameState.currentPlayer
+                currentPlayer = if (winner == null) nextPlayer else gameState.currentPlayer,
+                round = gameState.round + 1
+            )
+
+            boardHistory = boardHistory.copy(
+                value = trimmedBoardHistory + gameState.currentBoard
             )
         }
     }
 
+    fun unDo() {
+        val round = gameState.round - 1
+
+        if (round < 0) return
+
+        val board = boardHistory.value[round]
+
+        gameState = gameState.copy(
+            currentBoard = board,
+            currentPlayer = if (round % 2 == 0) "X" else "O",
+            round = round,
+            winner = null,
+        )
+    }
+
+    fun reDo(){
+        val round = gameState.round + 1
+        if (round > boardHistory.value.count() -1) return
+
+        val board = boardHistory.value[round]
+
+        val winner = checkWinner(boardHistory.value[round].value)
+
+        gameState = gameState.copy(
+            currentBoard = board,
+            currentPlayer = if (round % 2 == 0) "X" else "O",
+            round = round,
+            winner = winner,
+        )
+    }
+
+
     fun resetGame() {
         gameState = GameState()
+        boardHistory = BoardHistory()
     }
 
     private fun checkWinner(board: List<List<String>>): String? {

@@ -25,6 +25,8 @@ fun TicTacToeScreen(viewModel: TicTacToeViewModel = viewModel()) {
     ) {
         Text("Tic Tac Toe", fontSize = 32.sp, fontWeight = FontWeight.Bold)
         Spacer(modifier = Modifier.height(16.dp))
+        Text("Round ${state.round}", fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
+        Spacer(modifier = Modifier.height(16.dp))
 
         for (i in 0..2) {
             Row {
@@ -41,7 +43,7 @@ fun TicTacToeScreen(viewModel: TicTacToeViewModel = viewModel()) {
                             modifier = Modifier.fillMaxSize()
                         ) {
                             Box(contentAlignment = Alignment.Center) {
-                                Text(state.board[i][j], fontSize = 36.sp, fontWeight = FontWeight.Bold)
+                                Text(state.currentBoard.value[i][j], fontSize = 36.sp, fontWeight = FontWeight.Bold)
                             }
                         }
                     }
@@ -53,13 +55,24 @@ fun TicTacToeScreen(viewModel: TicTacToeViewModel = viewModel()) {
 
         when {
             state.winner != null -> Text("Winner: ${state.winner}", fontSize = 24.sp, color = Color.Green)
-            state.board.all { row -> row.all { it != "" } } -> Text("It's a draw!", fontSize = 24.sp, color = Color.Gray)
+            state.currentBoard.value.all { row -> row.all { it != "" } } -> Text("It's a draw!", fontSize = 24.sp, color = Color.Gray)
             else -> Text("Turn: ${state.currentPlayer}", fontSize = 24.sp)
         }
 
         Spacer(modifier = Modifier.height(16.dp))
         Button(onClick = { viewModel.resetGame() }) {
             Text("Restart")
+        }
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Row{
+            Button(onClick = { viewModel.unDo() }) {
+                Text("Undo")
+            }
+            Spacer(modifier = Modifier.width(16.dp))
+            Button(onClick = { viewModel.reDo()  }) {
+                Text("Redo")
+            }
         }
     }
 }
