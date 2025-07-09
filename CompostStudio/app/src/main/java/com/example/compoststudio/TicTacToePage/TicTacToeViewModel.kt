@@ -1,10 +1,10 @@
-package com.example.compoststudio.viewmodel
+package com.example.compoststudio.TicTacToePage
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
-import androidx.compose.runtime.*
-import com.example.compoststudio.model.Board
-import com.example.compoststudio.model.GameState
-import com.example.compoststudio.model.BoardHistory
+import kotlin.collections.plus
 
 class TicTacToeViewModel : ViewModel() {
 

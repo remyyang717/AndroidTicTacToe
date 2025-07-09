@@ -1,4 +1,4 @@
-package com.example.compoststudio.model
+package com.example.compoststudio.TicTacToePage
 
 
 data class Board(
