@@ -59,4 +59,11 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
     implementation(libs.material3)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
+    implementation (libs.androidx.foundation)
+    implementation (libs.foundation)
+
+    implementation (platform(libs.androidx.compose.bom.v20250700))
+    implementation (libs.androidx.compose.foundation.foundation)
+    implementation (libs.androidx.material)
+    implementation(libs.androidx.material.icons.extended)
 }

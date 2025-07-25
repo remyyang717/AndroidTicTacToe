@@ -16,7 +16,9 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.compoststudio.TicTacToePage.TicTacToeScreen
+import com.example.compoststudio.X6ren.D6renScreen
 import com.example.compoststudio.X6ren.X6renScreen
+import com.example.compoststudio.loginPage.LoginScreen
 import com.example.compoststudio.ui.theme.CompostStudioTheme
 import kotlinx.coroutines.launch
 
@@ -39,7 +41,7 @@ fun MainScreen() {
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
 
-    val navItems = listOf("TicTacToe", "X6ren")
+    val navItems = listOf("TicTacToe", "D6ren","X6ren","LoginAutoFill")
 
     ModalNavigationDrawer(
         drawerState = drawerState,
@@ -80,7 +82,9 @@ fun MainScreen() {
                 modifier = Modifier.padding(innerPadding)
             ) {
                 composable("TicTacToe") { TicTacToeScreen() }
+                composable("D6ren") { D6renScreen() }
                 composable("X6ren") { X6renScreen() }
+                composable("LoginAutoFill") { LoginScreen() }
             }
         }
     }
