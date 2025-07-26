@@ -1,4 +1,4 @@
-package com.example.compoststudio
+package com.example.compoststudio.ui.screens.activity
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -15,13 +15,13 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.compoststudio.TicTacToePage.TicTacToeScreen
-import com.example.compoststudio.X6ren.D6renScreen
-import com.example.compoststudio.X6ren.X6renScreen
 import com.example.compoststudio.loginPage.LoginScreen
+import com.example.compoststudio.ui.screens.tictactoe.TicTacToe
 import com.example.compoststudio.ui.theme.CompostStudioTheme
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,7 +41,7 @@ fun MainScreen() {
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
 
-    val navItems = listOf("TicTacToe", "D6ren","X6ren","LoginAutoFill")
+    val navItems = listOf("TicTacToe","LoginAutoFill")
 
     ModalNavigationDrawer(
         drawerState = drawerState,
@@ -81,9 +81,7 @@ fun MainScreen() {
                 startDestination = "TicTacToe",
                 modifier = Modifier.padding(innerPadding)
             ) {
-                composable("TicTacToe") { TicTacToeScreen() }
-                composable("D6ren") { D6renScreen() }
-                composable("X6ren") { X6renScreen() }
+                composable("TicTacToe") { TicTacToe() }
                 composable("LoginAutoFill") { LoginScreen() }
             }
         }
