@@ -5,6 +5,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -14,9 +15,20 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
+import com.example.compoststudio.data.model.GameState
 
 @Composable
-fun TicTacToe(viewModel: TicTacToeViewModel = hiltViewModel()) {
+fun TicTacToe(
+    navController: NavController,
+    shouldReset: Boolean = false,
+    initialGameState: GameState = GameState.default(), // fallback
+    viewModel: TicTacToeViewModel = hiltViewModel()
+) {
+
+    LaunchedEffect(shouldReset, initialGameState) {
+        viewModel.loadGame(shouldReset, initialGameState)
+    }
 
     val state by viewModel.gameState.collectAsState()
 
@@ -27,14 +39,16 @@ fun TicTacToe(viewModel: TicTacToeViewModel = hiltViewModel()) {
             modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.Center
         ) {
+
             Column(
                 modifier = Modifier.padding(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
+                Spacer(modifier = Modifier.weight(1f))
                 Text("Tic Tac Toe", fontSize = 32.sp, fontWeight = FontWeight.Bold)
                 Spacer(modifier = Modifier.height(16.dp))
-                Text("Round 1", fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
+                Text("Round ${state.round}", fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
                 Spacer(modifier = Modifier.height(16.dp))
 
                 for (i in 0..2) {
@@ -94,6 +108,14 @@ fun TicTacToe(viewModel: TicTacToeViewModel = hiltViewModel()) {
                     Spacer(modifier = Modifier.width(16.dp))
                     Button(onClick = { viewModel.reDo() }) {
                         Text("Redo")
+                    }
+                }
+                Spacer(modifier = Modifier.weight(1f))
+                Row(modifier = Modifier.padding(bottom  = 24.dp)) {
+                    Button(onClick = {
+                        viewModel.saveGame()
+                        navController.popBackStack()}) {
+                        Text("Save and Back")
                     }
                 }
             }

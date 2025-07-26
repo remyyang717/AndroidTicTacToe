@@ -16,8 +16,10 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.compoststudio.loginPage.LoginScreen
+import com.example.compoststudio.ui.screens.mainscreen.MainScreen
 import com.example.compoststudio.ui.screens.tictactoe.TicTacToe
 import com.example.compoststudio.ui.theme.CompostStudioTheme
+import com.piashcse.hilt_mvvm_compose_movie.navigation.Navigation
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -28,61 +30,8 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             CompostStudioTheme {
-                MainScreen()
-            }
-        }
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun MainScreen() {
-    val navController = rememberNavController()
-    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
-    val scope = rememberCoroutineScope()
-
-    val navItems = listOf("TicTacToe","LoginAutoFill")
-
-    ModalNavigationDrawer(
-        drawerState = drawerState,
-        drawerContent = {
-            ModalDrawerSheet {
-                Text("Menu", modifier = Modifier.padding(16.dp))
-                navItems.forEach { item ->
-                    NavigationDrawerItem(
-                        label = { Text(item) },
-                        selected = false,
-                        onClick = {
-                            scope.launch {
-                                drawerState.close()
-                            }
-                            navController.navigate(item.lowercase())
-                        },
-                        modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
-                    )
-                }
-            }
-        }
-    ) {
-        Scaffold(
-            topBar = {
-                TopAppBar(
-                    title = { Text("Remy的奇怪练习") },
-                    navigationIcon = {
-                        IconButton(onClick = { scope.launch { drawerState.open() } }) {
-                            Icon(Icons.Default.Menu, contentDescription = "Menu")
-                        }
-                    }
-                )
-            }
-        ) { innerPadding ->
-            NavHost(
-                navController = navController,
-                startDestination = "TicTacToe",
-                modifier = Modifier.padding(innerPadding)
-            ) {
-                composable("TicTacToe") { TicTacToe() }
-                composable("LoginAutoFill") { LoginScreen() }
+                val navController = rememberNavController()
+                Navigation(navController = navController)
             }
         }
     }

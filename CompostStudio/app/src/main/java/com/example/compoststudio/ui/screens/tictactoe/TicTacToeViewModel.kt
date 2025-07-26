@@ -3,29 +3,39 @@ package com.example.compoststudio.ui.screens.tictactoe
 
 import androidx.lifecycle.ViewModel
 import com.example.compoststudio.data.model.Board
-import com.example.compoststudio.data.model.BoardHistory
 import com.example.compoststudio.data.model.GameState
+import com.example.compoststudio.data.repository.local.game_state.LocalGameStateRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import javax.inject.Inject
-import kotlin.collections.get
 import kotlin.collections.plus
-import kotlin.text.get
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
 
 
 @HiltViewModel
 class TicTacToeViewModel @Inject constructor(
-    private val initialState: GameState,
-    private val initialHistory: BoardHistory
+    private val localGameStateRepository: LocalGameStateRepository,
 ) : ViewModel() {
+    private val _gameState = MutableStateFlow(GameState.default())
 
-    private val _gameState = MutableStateFlow(initialState)
     val gameState: StateFlow<GameState> = _gameState.asStateFlow()
 
-    private val _history = MutableStateFlow(initialHistory)
-    val history: StateFlow<BoardHistory> = _history.asStateFlow()
+    fun loadGame(shouldReset: Boolean, existingState: GameState? = null) {
+        viewModelScope.launch {
+            _gameState.value = if (shouldReset || existingState == null) {
+                GameState.default()
+            } else {
+                existingState
+            }
+        }
+    }
+
+    suspend fun getLatestSavedGame(): GameState? {
+        return localGameStateRepository.getLatest()
+    }
 
     fun makeMove(row: Int, col: Int) {
         val currentState = _gameState.value
@@ -40,10 +50,10 @@ class TicTacToeViewModel @Inject constructor(
 
             val winner = checkWinner(updatedBoard)
             val nextPlayer = if (currentState.currentPlayer == "X") "O" else "X"
-            val trimmedBoardHistory = if (currentState.round < _history.value.boardHistory.size) {
-                _history.value.boardHistory.slice(0..currentState.round)
+            val trimmedBoardHistory = if (currentState.round < _gameState.value.boardHistory.size) {
+                _gameState.value.boardHistory.slice(0..currentState.round)
             } else {
-                _history.value.boardHistory
+                _gameState.value.boardHistory
             }
 
             _gameState.value = currentState.copy(
@@ -53,7 +63,7 @@ class TicTacToeViewModel @Inject constructor(
                 round = currentState.round + 1
             )
 
-            _history.value = _history.value.copy(
+            _gameState.value = _gameState.value.copy(
                 boardHistory = trimmedBoardHistory + _gameState.value.currentBoard
             )
         }
@@ -63,7 +73,7 @@ class TicTacToeViewModel @Inject constructor(
         val round = _gameState.value.round - 1
         if (round < 0) return
 
-        val board = _history.value.boardHistory[round]
+        val board = _gameState.value.boardHistory[round]
 
         _gameState.value = _gameState.value.copy(
             currentBoard = board,
@@ -75,9 +85,9 @@ class TicTacToeViewModel @Inject constructor(
 
     fun reDo() {
         val round = _gameState.value.round + 1
-        if (round > _history.value.boardHistory.lastIndex) return
+        if (round > _gameState.value.boardHistory.lastIndex) return
 
-        val board = _history.value.boardHistory[round]
+        val board = _gameState.value.boardHistory[round]
         val winner = checkWinner(board.board)
 
         _gameState.value = _gameState.value.copy(
@@ -89,8 +99,13 @@ class TicTacToeViewModel @Inject constructor(
     }
 
     fun resetGame() {
-        _gameState.value = initialState.copy()
-        _history.value = initialHistory.copy()
+        _gameState.value = GameState.default()
+    }
+
+    fun saveGame() {
+        viewModelScope.launch {
+            localGameStateRepository.insert(_gameState.value)
+        }
     }
 
     private fun checkWinner(board: List<List<String>>): String? {
