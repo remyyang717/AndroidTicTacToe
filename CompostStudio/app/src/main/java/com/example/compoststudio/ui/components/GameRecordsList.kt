@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
@@ -35,6 +36,7 @@ import androidx.compose.material.DismissValue
 //noinspection UsingMaterialAndMaterial3Libraries
 import androidx.compose.material.rememberDismissState
 import androidx.compose.material.ExperimentalMaterialApi
+//noinspection UsingMaterialAndMaterial3Libraries
 import androidx.compose.material.FractionalThreshold
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -44,8 +46,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.compoststudio.ui.screens.tictactoe.TicTacToeViewModel
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @SuppressLint("ConfigurationScreenWidthHeight")
@@ -70,8 +70,7 @@ fun GameRecordsList(
             }
     ){
 
-        items(gameIdList.size) {index ->
-            val id = gameIdList[index]
+        items(gameIdList,key = { it }) {id ->
             GameListItem(
                 gameId = id,
                 onLoadClick = { navController.navigate("continue_game/${id}") },
@@ -94,7 +93,6 @@ fun GameListItem(
         confirmStateChange = { dismissValue ->
             if (dismissValue == DismissValue.DismissedToEnd || dismissValue == DismissValue.DismissedToStart) {
                 coroutineScope.launch {
-                    delay(300) // 确保动画走完
                     onDelete() // 调用 viewModel.deleteGame(id)
                 }
                 true

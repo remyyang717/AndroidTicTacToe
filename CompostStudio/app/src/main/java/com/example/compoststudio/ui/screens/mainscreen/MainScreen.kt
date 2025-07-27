@@ -109,7 +109,6 @@ fun MainScreen(
                     shape = RoundedCornerShape(16.dp),
                     onClick =
                         {
-                            viewModel.loadGameIds()
                             showRecords = true
                         },
                     modifier = Modifier.fillMaxWidth()

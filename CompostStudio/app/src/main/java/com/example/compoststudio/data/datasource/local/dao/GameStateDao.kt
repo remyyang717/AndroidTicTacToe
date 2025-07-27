@@ -5,6 +5,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.example.compoststudio.data.model.GameState
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface GameStateDao {
@@ -23,5 +24,5 @@ interface GameStateDao {
     suspend fun deleteGameStateById(id: Int)
 
     @Query("SELECT * FROM Game_State")
-    suspend fun getAllGameState(): List<GameState?>
+    fun getAllGameState(): Flow<List<GameState>>
 }

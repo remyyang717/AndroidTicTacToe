@@ -12,6 +12,9 @@ import kotlinx.coroutines.flow.asStateFlow
 import javax.inject.Inject
 import kotlin.collections.plus
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 
@@ -23,11 +26,14 @@ class TicTacToeViewModel @Inject constructor(
     val gameState: StateFlow<GameState> = _gameState.asStateFlow()
 
     private val _gameIdList = MutableStateFlow<List<Int>>(emptyList())
-    val gameIdList: StateFlow<List<Int>> = _gameIdList
 
-    init {
-        loadGameIds()
-    }
+    val gameIdList: StateFlow<List<Int>> = localGameStateRepository.getAll()
+        .map { list -> list.map { it.id } }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5_000),
+            initialValue = emptyList()
+        )
 
     fun loadGame(shouldReset: Boolean, existingState: GameState? = null) {
         viewModelScope.launch {
@@ -39,26 +45,17 @@ class TicTacToeViewModel @Inject constructor(
         }
     }
 
-
     suspend fun getSavedGameById(id:Int): GameState? {
         return localGameStateRepository.getById(id)
     }
-
-    suspend fun getAllGames(): List<GameState>? {
-        return localGameStateRepository.getAll()
-    }
-
-    fun loadGameIds() {
-        viewModelScope.launch {
-            val games = getAllGames()
-            _gameIdList.value = games?.map { it.id } ?: emptyList()
-        }
-    }
-
     fun deleteGame(id: Int) {
         viewModelScope.launch {
             localGameStateRepository.deleteById(id)
-            loadGameIds()
+        }
+    }
+    fun saveGame() {
+        viewModelScope.launch {
+            localGameStateRepository.insert(_gameState.value)
         }
     }
 
@@ -129,11 +126,7 @@ class TicTacToeViewModel @Inject constructor(
         _gameState.value = GameState.default()
     }
 
-    fun saveGame() {
-        viewModelScope.launch {
-            localGameStateRepository.insert(_gameState.value)
-        }
-    }
+
 
     private fun checkWinner(board: List<List<String>>): String? {
         for (i in 0..2) {
