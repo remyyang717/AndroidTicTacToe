@@ -2,6 +2,7 @@ package com.example.compoststudio.ui.components
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -34,30 +35,43 @@ import androidx.compose.material.DismissValue
 //noinspection UsingMaterialAndMaterial3Libraries
 import androidx.compose.material.rememberDismissState
 import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.FractionalThreshold
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.compoststudio.ui.screens.tictactoe.TicTacToeViewModel
 
 @SuppressLint("ConfigurationScreenWidthHeight")
 @Composable
 fun GameRecordsList(
-    gameIdList : List<Int>,
     navController: NavController,
+    viewModel: TicTacToeViewModel = hiltViewModel()
 ){
+
+    val gameIdList by viewModel.gameIdList.collectAsState()
+
     val screenHeight = LocalConfiguration.current.screenHeightDp.dp
 
     LazyColumn (
         modifier = Modifier.height(screenHeight/2)
             .padding(16.dp)
             .fillMaxWidth()
-
+            .pointerInput(Unit) {
+                detectTapGestures(onTap = {
+                    // 拦截点击但不做任何事 —— 阻止冒泡
+                })
+            }
     ){
 
         items(gameIdList.size) {index ->
             val id = gameIdList[index]
             GameListItem(
-                gameId = index+1,
+                gameId = id,
                 onLoadClick = { navController.navigate("continue_game/${id}") },
-                onDelete = { /* delete from DB */ }
+                onDelete = {viewModel.deleteGame(id) }
             )
         }
     }
@@ -83,6 +97,10 @@ fun GameListItem(
 
     SwipeToDismiss(
         state = dismissState,
+        directions = setOf(DismissDirection.StartToEnd, DismissDirection.EndToStart),
+        dismissThresholds = {
+            FractionalThreshold(0.6f)
+        },
         background = {
             val color = when (dismissState.dismissDirection) {
                 DismissDirection.StartToEnd, DismissDirection.EndToStart -> Color.Red

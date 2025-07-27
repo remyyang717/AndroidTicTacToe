@@ -44,7 +44,8 @@ fun Navigation(
                 TicTacToe(
                     navController = navController,
                     shouldReset = false,
-                    initialGameState = existingState
+                    initialGameState = existingState,
+                    viewModel = viewModel,
                 )
             } ?: run {
                 androidx.compose.material3.Text("No saved game found.")

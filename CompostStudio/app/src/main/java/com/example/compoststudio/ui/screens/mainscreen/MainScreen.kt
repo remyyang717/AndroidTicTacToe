@@ -29,13 +29,19 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.compoststudio.R
 import com.example.compoststudio.ui.components.GameRecordsList
+import com.example.compoststudio.ui.screens.tictactoe.TicTacToeViewModel
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.layout.Box
+import androidx.compose.ui.input.pointer.pointerInput
 
 @Composable
 fun MainScreen(
     navController: NavController,
+    viewModel: TicTacToeViewModel = hiltViewModel()
 ) {
     Surface(
         modifier = Modifier.fillMaxSize(),
@@ -44,75 +50,89 @@ fun MainScreen(
 
         val animationDuration : Int = 800
 
-        Column(
+        Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(32.dp),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
+                .pointerInput(showRecords) {
+                    detectTapGestures {
+                        if (showRecords) {
+                            showRecords = false
+                        }
+                    }
+                }
         ) {
-            Spacer(modifier = Modifier.weight(1f))
-            Text("Tic Tac Toe", style = MaterialTheme.typography.headlineLarge)
-            Spacer(modifier = Modifier.weight(0.2f))
-
-
-            AnimatedVisibility(
-                visible = !showRecords,
-                enter = expandVertically(animationSpec = tween(durationMillis = animationDuration)),
-                exit = shrinkVertically(animationSpec = tween(durationMillis = animationDuration))
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(32.dp),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Image(
-                    painter = painterResource(id = R.drawable.game_pic),
-                    contentDescription = "Game Logo",
-                    contentScale = ContentScale.FillWidth,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp)
-                        .scale(1.4f)
-                )
+                Spacer(modifier = Modifier.weight(1f))
+                Text("Tic Tac Toe", style = MaterialTheme.typography.headlineLarge)
+                Spacer(modifier = Modifier.weight(0.2f))
+
+
+                AnimatedVisibility(
+                    visible = !showRecords,
+                    enter = expandVertically(animationSpec = tween(durationMillis = animationDuration)),
+                    exit = shrinkVertically(animationSpec = tween(durationMillis = animationDuration))
+                ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.game_pic),
+                        contentDescription = "Game Logo",
+                        contentScale = ContentScale.FillWidth,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp)
+                            .scale(1.4f)
+                    )
+                }
+
+
+
+                Spacer(modifier = Modifier.weight(0.2f))
+
+                Button(
+                    shape = RoundedCornerShape(16.dp),
+                    onClick = { navController.navigate("new_game") },
+                    modifier = Modifier.fillMaxWidth()
+                        .padding(horizontal = 16.dp)
+
+                ) {
+                    Text("Start a New Game")
+                }
+
+                Spacer(modifier = Modifier.height(32.dp))
+
+                Button(
+                    shape = RoundedCornerShape(16.dp),
+                    onClick =
+                        {
+                            viewModel.loadGameIds()
+                            showRecords = true
+                        },
+                    modifier = Modifier.fillMaxWidth()
+                        .padding(horizontal = 16.dp)
+                ) {
+                    Text("Load a Game")
+                }
+                Spacer(modifier = Modifier.height(16.dp))
+
+
+                AnimatedVisibility(
+                    visible = showRecords,
+                    enter = expandVertically(animationSpec = tween(durationMillis = animationDuration)),
+                    exit = shrinkVertically(animationSpec = tween(durationMillis = animationDuration))
+                ) {
+                    GameRecordsList(navController = navController)
+                }
+
+                val weightAnim by animateFloatAsState(targetValue = if (!showRecords) 1f else 0.2f)
+                Spacer(modifier = Modifier.weight(weightAnim))
             }
-
-
-
-            Spacer(modifier = Modifier.weight(0.2f))
-
-            Button(
-                shape = RoundedCornerShape(16.dp),
-                onClick = { navController.navigate("new_game") },
-                modifier = Modifier.fillMaxWidth()
-                    .padding(horizontal = 16.dp)
-
-            ) {
-                Text("Start a New Game")
-            }
-
-            Spacer(modifier = Modifier.height(32.dp))
-
-            Button(
-                shape = RoundedCornerShape(16.dp),
-                onClick =
-                    {
-//                        navController.navigate("continue_game")
-                        showRecords = true
-                    },
-                modifier = Modifier.fillMaxWidth()
-                    .padding(horizontal = 16.dp)
-            ) {
-                Text("Load a Game")
-            }
-            Spacer(modifier = Modifier.height(16.dp))
-
-
-            AnimatedVisibility(
-                visible = showRecords,
-                enter = expandVertically(animationSpec = tween(durationMillis = animationDuration)),
-                exit = shrinkVertically(animationSpec = tween(durationMillis = animationDuration))
-            ) {
-                GameRecordsList(listOf(1,2,3,4,5), navController)
-            }
-
-            val weightAnim by animateFloatAsState(targetValue = if (!showRecords) 1f else 0.2f)
-            Spacer(modifier = Modifier.weight(weightAnim))
         }
+
+
     }
 }

@@ -20,8 +20,15 @@ class TicTacToeViewModel @Inject constructor(
     private val localGameStateRepository: LocalGameStateRepository,
 ) : ViewModel() {
     private val _gameState = MutableStateFlow(GameState.default())
-
     val gameState: StateFlow<GameState> = _gameState.asStateFlow()
+
+    private val _gameIdList = MutableStateFlow<List<Int>>(emptyList())
+    val gameIdList: StateFlow<List<Int>> = _gameIdList
+
+    init {
+        loadGameIds()
+    }
+
 
     fun loadGame(shouldReset: Boolean, existingState: GameState? = null) {
         viewModelScope.launch {
@@ -33,9 +40,31 @@ class TicTacToeViewModel @Inject constructor(
         }
     }
 
+
+
     suspend fun getSavedGameById(id:Int): GameState? {
         return localGameStateRepository.getById(id)
     }
+
+    suspend fun getAllGames(): List<GameState>? {
+        return localGameStateRepository.getAll()
+    }
+
+    fun loadGameIds() {
+        viewModelScope.launch {
+            val games = getAllGames()
+            _gameIdList.value = games?.map { it.id } ?: emptyList()
+        }
+    }
+
+    fun deleteGame(id: Int) {
+        viewModelScope.launch {
+            localGameStateRepository.deleteById(id)
+            loadGameIds()
+        }
+    }
+
+
 
     fun makeMove(row: Int, col: Int) {
         val currentState = _gameState.value
