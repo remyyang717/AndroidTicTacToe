@@ -29,7 +29,6 @@ class TicTacToeViewModel @Inject constructor(
         loadGameIds()
     }
 
-
     fun loadGame(shouldReset: Boolean, existingState: GameState? = null) {
         viewModelScope.launch {
             _gameState.value = if (shouldReset || existingState == null) {
@@ -39,7 +38,6 @@ class TicTacToeViewModel @Inject constructor(
             }
         }
     }
-
 
 
     suspend fun getSavedGameById(id:Int): GameState? {

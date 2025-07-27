@@ -38,11 +38,15 @@ import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.FractionalThreshold
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.compoststudio.ui.screens.tictactoe.TicTacToeViewModel
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @SuppressLint("ConfigurationScreenWidthHeight")
 @Composable
@@ -56,7 +60,7 @@ fun GameRecordsList(
     val screenHeight = LocalConfiguration.current.screenHeightDp.dp
 
     LazyColumn (
-        modifier = Modifier.height(screenHeight/2)
+        modifier = Modifier.height(screenHeight/3)
             .padding(16.dp)
             .fillMaxWidth()
             .pointerInput(Unit) {
@@ -84,10 +88,15 @@ fun GameListItem(
     onLoadClick: () -> Unit,
     onDelete: () -> Unit,
 ) {
+    val coroutineScope = rememberCoroutineScope()
+
     val dismissState = rememberDismissState(
         confirmStateChange = { dismissValue ->
             if (dismissValue == DismissValue.DismissedToEnd || dismissValue == DismissValue.DismissedToStart) {
-                onDelete()
+                coroutineScope.launch {
+                    delay(300) // 确保动画走完
+                    onDelete() // 调用 viewModel.deleteGame(id)
+                }
                 true
             } else {
                 false
