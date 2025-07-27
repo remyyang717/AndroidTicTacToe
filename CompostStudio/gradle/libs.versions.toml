@@ -6,6 +6,7 @@ junit = "4.13.2"
 androidx-junit = "1.2.1"
 espresso-core = "3.6.1"
 lifecycle-viewmodel-ktx = "2.9.2"
+material-version = "1.8.3"
 splashscreen = "1.0.1"
 constraint-layout-compose = "1.1.1"
 lifecycle-runtime-ktx = "2.9.1"
@@ -32,6 +33,7 @@ room = "2.7.2"
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "core-ktx" }
 androidx-hilt-navigation-compose = { module = "androidx.hilt:hilt-navigation-compose", version.ref = "hilt-navigation-compose" }
 androidx-lifecycle-viewmodel-ktx = { module = "androidx.lifecycle:lifecycle-viewmodel-ktx", version.ref = "lifecycle-viewmodel-ktx" }
+androidx-material = { module = "androidx.compose.material:material", version.ref = "material-version" }
 androidx-material-icons-extended = { module = "androidx.compose.material:material-icons-extended", version.ref = "material-icons-extended" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "androidx-junit" }

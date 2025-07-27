@@ -30,10 +30,12 @@ fun Navigation(
             ) // or pass viewModel if needed
         }
 
-        composable("continue_game") {
+        composable("continue_game/{id}") { backStackEntry ->
             val viewModel: TicTacToeViewModel = hiltViewModel()
+            val id = backStackEntry.arguments?.getString("id")?.toIntOrNull()
+
             val existingStateState = produceState<GameState?>(initialValue = null) {
-                value = viewModel.getLatestSavedGame()
+                value = id?.let { viewModel.getSavedGameById(it) }
             }
 
             val existingState = existingStateState.value
@@ -42,18 +44,11 @@ fun Navigation(
                 TicTacToe(
                     navController = navController,
                     shouldReset = false,
-                    initialGameState = it
+                    initialGameState = existingState
                 )
             } ?: run {
                 androidx.compose.material3.Text("No saved game found.")
             }
         }
     }
-}
-
-
-@Composable
-fun currentRoute(navController: NavController): String? {
-    val navBackStackEntry by navController.currentBackStackEntryAsState()
-    return navBackStackEntry?.destination?.route?.substringBeforeLast("/")
 }

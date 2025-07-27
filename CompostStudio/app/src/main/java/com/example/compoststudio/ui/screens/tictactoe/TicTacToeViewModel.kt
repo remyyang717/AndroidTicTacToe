@@ -33,8 +33,8 @@ class TicTacToeViewModel @Inject constructor(
         }
     }
 
-    suspend fun getLatestSavedGame(): GameState? {
-        return localGameStateRepository.getLatest()
+    suspend fun getSavedGameById(id:Int): GameState? {
+        return localGameStateRepository.getById(id)
     }
 
     fun makeMove(row: Int, col: Int) {
