@@ -2,15 +2,11 @@ package com.example.compoststudio.navigation
 
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.produceState
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.example.compoststudio.data.model.GameState
 import com.example.compoststudio.ui.screens.mainscreen.MainScreen
 import com.example.compoststudio.ui.screens.tictactoe.TicTacToe
-import com.example.compoststudio.ui.screens.tictactoe.TicTacToeViewModel
 
 
 @Composable
@@ -19,33 +15,25 @@ fun Navigation(
 ) {
     NavHost(navController, startDestination = "main") {
         composable("main") {
-            MainScreen( navController = navController,)
+            MainScreen( navController = navController)
         }
 
         composable("new_game") {
             TicTacToe(  navController = navController,
                         shouldReset = true
-            ) // or pass viewModel if needed
+            )
         }
 
         composable("continue_game/{id}") { backStackEntry ->
-            val viewModel: TicTacToeViewModel = hiltViewModel()
             val id = backStackEntry.arguments?.getString("id")?.toIntOrNull()
 
-            val existingStateState = produceState<GameState?>(initialValue = null) {
-                value = id?.let { viewModel.getSavedGameById(it) }
-            }
-
-            val existingState = existingStateState.value
-
-            existingState?.let {
+            id?.let {
                 TicTacToe(
                     navController = navController,
                     shouldReset = false,
-                    initialGameState = existingState,
-                    viewModel = viewModel,
+                    savedGameId = it
                 )
-            } ?: run {
+            }  ?: run {
                 Text("No saved game found.")
             }
         }

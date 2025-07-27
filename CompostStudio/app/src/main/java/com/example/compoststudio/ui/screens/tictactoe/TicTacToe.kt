@@ -35,12 +35,17 @@ import com.example.compoststudio.data.model.GameState
 fun TicTacToe(
     navController: NavController,
     shouldReset: Boolean = false,
-    initialGameState: GameState = GameState.default(), // fallback
+    savedGameId: Int? = null,
     viewModel: TicTacToeViewModel = hiltViewModel()
 ) {
 
-    LaunchedEffect(shouldReset, initialGameState) {
-        viewModel.loadGame(shouldReset, initialGameState)
+    LaunchedEffect(shouldReset, savedGameId) {
+        if (shouldReset) {
+            viewModel.loadGame(shouldReset = true)
+        } else if (savedGameId != null) {
+            val savedState = viewModel.getSavedGameById(savedGameId)
+            viewModel.loadGame(shouldReset = false, existingState = savedState)
+        }
     }
 
     val state by viewModel.gameState.collectAsState()
