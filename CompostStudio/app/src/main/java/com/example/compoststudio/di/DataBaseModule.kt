@@ -17,7 +17,7 @@ object DataBaseModule {
 
     @Provides
     @Singleton
-    fun provideMovieDatabase(@ApplicationContext context: Context): GameStateDatabase {
+    fun provideGameStateDatabase(@ApplicationContext context: Context): GameStateDatabase {
         return Room.databaseBuilder(
             context,
             GameStateDatabase::class.java,
@@ -27,6 +27,6 @@ object DataBaseModule {
 
     @Singleton
     @Provides
-    fun provideMovieDetailDao(gameStateDatabase: GameStateDatabase): GameStateDao =
+    fun provideGameStateDao(gameStateDatabase: GameStateDatabase): GameStateDao =
         gameStateDatabase.getGameStateDao()
 }

@@ -59,26 +59,38 @@ fun GameRecordsList(
 
     val screenHeight = LocalConfiguration.current.screenHeightDp.dp
 
-    LazyColumn (
-        modifier = Modifier.height(screenHeight/3)
-            .padding(16.dp)
-            .fillMaxWidth()
-            .pointerInput(Unit) {
-                detectTapGestures(onTap = {
-                    // 拦截点击但不做任何事 —— 阻止冒泡
-                })
-            }
-    ){
+    if (gameIdList.isEmpty()) {
+        Text(
+            "No saved games yet.",
+            modifier = Modifier.padding(16.dp),
+            style = MaterialTheme.typography.bodyMedium
+        )
+    } else {
+        LazyColumn (
+            modifier = Modifier.height(screenHeight/3)
+                .padding(16.dp)
+                .fillMaxWidth()
+                .pointerInput(Unit) {
+                    detectTapGestures(onTap = {
+                        // don't let the record hide
+                    })
+                }
+        ){
 
-        items(gameIdList,key = { it }) {id ->
-            GameListItem(
-                gameId = id,
-                onLoadClick = { navController.navigate("continue_game/${id}") },
-                onDelete = {viewModel.deleteGame(id) }
-            )
+            items(gameIdList,key = { it }) {id ->
+                GameListItem(
+                    gameId = id,
+                    onLoadClick = { navController.navigate("continue_game/${id}") },
+                    onDelete = {viewModel.deleteGame(id) }
+                )
+            }
         }
     }
+
+
 }
+
+
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
 @Composable

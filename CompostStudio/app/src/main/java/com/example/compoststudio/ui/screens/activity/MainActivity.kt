@@ -6,7 +6,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.navigation.compose.rememberNavController
 import com.example.compoststudio.ui.theme.CompostStudioTheme
-import com.piashcse.hilt_mvvm_compose_movie.navigation.Navigation
+import com.example.compoststudio.navigation.Navigation
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint

@@ -25,7 +25,6 @@ class TicTacToeViewModel @Inject constructor(
     private val _gameState = MutableStateFlow(GameState.default())
     val gameState: StateFlow<GameState> = _gameState.asStateFlow()
 
-    private val _gameIdList = MutableStateFlow<List<Int>>(emptyList())
 
     val gameIdList: StateFlow<List<Int>> = localGameStateRepository.getAll()
         .map { list -> list.map { it.id } }
@@ -65,7 +64,10 @@ class TicTacToeViewModel @Inject constructor(
         val currentState = _gameState.value
         val currentBoard = currentState.currentBoard.board
 
+        // Check if user can make a move
         if (currentBoard[row][col] == "" && currentState.winner == null) {
+
+            // if user can make a move, update the board
             val updatedBoard = currentBoard.mapIndexed { r, rowList ->
                 rowList.mapIndexed { c, cell ->
                     if (r == row && c == col) currentState.currentPlayer else cell
@@ -73,13 +75,18 @@ class TicTacToeViewModel @Inject constructor(
             }
 
             val winner = checkWinner(updatedBoard)
+
             val nextPlayer = if (currentState.currentPlayer == "X") "O" else "X"
+
+            // if user making a move while in a redo process
             val trimmedBoardHistory = if (currentState.round < _gameState.value.boardHistory.size) {
                 _gameState.value.boardHistory.slice(0..currentState.round)
             } else {
                 _gameState.value.boardHistory
             }
 
+
+            // update value before putting the board into the board history list
             _gameState.value = currentState.copy(
                 currentBoard = Board(updatedBoard),
                 winner = winner,
@@ -87,6 +94,7 @@ class TicTacToeViewModel @Inject constructor(
                 round = currentState.round + 1
             )
 
+            // update the board History
             _gameState.value = _gameState.value.copy(
                 boardHistory = trimmedBoardHistory + _gameState.value.currentBoard
             )
@@ -126,13 +134,14 @@ class TicTacToeViewModel @Inject constructor(
         _gameState.value = GameState.default()
     }
 
-
-
     private fun checkWinner(board: List<List<String>>): String? {
         for (i in 0..2) {
+            // check i row
             if (board[i][0] != "" && board[i][0] == board[i][1] && board[i][1] == board[i][2]) return board[i][0]
+            //check i column
             if (board[0][i] != "" && board[0][i] == board[1][i] && board[1][i] == board[2][i]) return board[0][i]
         }
+        // check diagonal
         if (board[0][0] != "" && board[0][0] == board[1][1] && board[1][1] == board[2][2]) return board[0][0]
         if (board[0][2] != "" && board[0][2] == board[1][1] && board[1][1] == board[2][0]) return board[0][2]
         return null

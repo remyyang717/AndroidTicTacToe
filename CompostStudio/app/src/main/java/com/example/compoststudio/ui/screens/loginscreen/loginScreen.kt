@@ -1,6 +1,7 @@
-package com.example.compoststudio.loginPage
+package com.example.compoststudio.loginscreen
 
-
+// We don't actually need this now,
+// may need this after practice with login with credential check in the cloud
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer

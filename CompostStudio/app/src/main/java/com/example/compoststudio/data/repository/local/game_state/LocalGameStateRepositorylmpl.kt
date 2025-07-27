@@ -8,9 +8,19 @@ import javax.inject.Inject
 class LocalGameStateRepositoryImpl @Inject constructor(
     private val gameStateDao: GameStateDao
 ) : LocalGameStateRepository {
-    override suspend fun insert(gameState: GameState) = gameStateDao.insert(gameState)
-    override suspend fun getLatest(): GameState? = gameStateDao.getLatestGameState()
-    override suspend fun getById(id: Int): GameState? = gameStateDao.getGameStateById(id)
-    override suspend fun deleteById(id: Int) = gameStateDao.deleteGameStateById(id)
-    override fun getAll(): Flow<List<GameState>> = gameStateDao.getAllGameState()
+
+
+    override fun getAll(): Flow<List<GameState>> =
+        gameStateDao.getAllGameState()
+
+
+    override suspend fun insert(gameState: GameState) =
+        gameStateDao.insert(gameState)
+
+    override suspend fun getById(id: Int): GameState? =
+        gameStateDao.getGameStateById(id)
+
+    override suspend fun deleteById(id: Int) =
+        gameStateDao.deleteGameStateById(id)
+
 }

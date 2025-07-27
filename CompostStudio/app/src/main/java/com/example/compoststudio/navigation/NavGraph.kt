@@ -1,14 +1,12 @@
-package com.piashcse.hilt_mvvm_compose_movie.navigation
+package com.example.compoststudio.navigation
 
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.produceState
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.compoststudio.data.model.GameState
 import com.example.compoststudio.ui.screens.mainscreen.MainScreen
 import com.example.compoststudio.ui.screens.tictactoe.TicTacToe
@@ -48,7 +46,7 @@ fun Navigation(
                     viewModel = viewModel,
                 )
             } ?: run {
-                androidx.compose.material3.Text("No saved game found.")
+                Text("No saved game found.")
             }
         }
     }

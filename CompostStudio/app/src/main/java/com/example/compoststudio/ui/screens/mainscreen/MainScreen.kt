@@ -29,32 +29,34 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.compoststudio.R
 import com.example.compoststudio.ui.components.GameRecordsList
-import com.example.compoststudio.ui.screens.tictactoe.TicTacToeViewModel
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.ui.input.pointer.pointerInput
 
+private const val ANIMATION_DURATION_MS  = 800
+
 @Composable
 fun MainScreen(
-    navController: NavController,
-    viewModel: TicTacToeViewModel = hiltViewModel()
+    navController: NavController
 ) {
     Surface(
         modifier = Modifier.fillMaxSize(),
     ) {
+        // control show records and hide game pic
         var showRecords by remember { mutableStateOf(false) }
 
-        val animationDuration : Int = 800
+        // control how fast records and game pic visibility toggling
+
 
         Box(
             modifier = Modifier
                 .fillMaxSize()
                 .pointerInput(showRecords) {
                     detectTapGestures {
+                        // can hide records list and show the game pic
                         if (showRecords) {
                             showRecords = false
                         }
@@ -68,64 +70,27 @@ fun MainScreen(
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
+
                 Spacer(modifier = Modifier.weight(1f))
-                Text("Tic Tac Toe", style = MaterialTheme.typography.headlineLarge)
-                Spacer(modifier = Modifier.weight(0.2f))
 
 
-                AnimatedVisibility(
-                    visible = !showRecords,
-                    enter = expandVertically(animationSpec = tween(durationMillis = animationDuration)),
-                    exit = shrinkVertically(animationSpec = tween(durationMillis = animationDuration))
-                ) {
-                    Image(
-                        painter = painterResource(id = R.drawable.game_pic),
-                        contentDescription = "Game Logo",
-                        contentScale = ContentScale.FillWidth,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp)
-                            .scale(1.4f)
-                    )
-                }
-
+                    Text("Tic Tac Toe", style = MaterialTheme.typography.headlineLarge)
 
 
                 Spacer(modifier = Modifier.weight(0.2f))
 
-                Button(
-                    shape = RoundedCornerShape(16.dp),
-                    onClick = { navController.navigate("new_game") },
-                    modifier = Modifier.fillMaxWidth()
-                        .padding(horizontal = 16.dp)
 
-                ) {
-                    Text("Start a New Game")
-                }
-
-                Spacer(modifier = Modifier.height(32.dp))
-
-                Button(
-                    shape = RoundedCornerShape(16.dp),
-                    onClick =
-                        {
-                            showRecords = true
-                        },
-                    modifier = Modifier.fillMaxWidth()
-                        .padding(horizontal = 16.dp)
-                ) {
-                    Text("Load a Game")
-                }
-                Spacer(modifier = Modifier.height(16.dp))
+                    ToggleableGamePic(showRecords,ANIMATION_DURATION_MS)
 
 
-                AnimatedVisibility(
-                    visible = showRecords,
-                    enter = expandVertically(animationSpec = tween(durationMillis = animationDuration)),
-                    exit = shrinkVertically(animationSpec = tween(durationMillis = animationDuration))
-                ) {
-                    GameRecordsList(navController = navController)
-                }
+                Spacer(modifier = Modifier.weight(0.2f))
+
+                    MainControlButtons({showRecords = it},navController)
+
+                Spacer(modifier = Modifier.weight(0.2f))
+
+
+                    ToggleableGameRecordList(showRecords,ANIMATION_DURATION_MS,navController)
 
                 val weightAnim by animateFloatAsState(targetValue = if (!showRecords) 1f else 0.2f)
                 Spacer(modifier = Modifier.weight(weightAnim))
@@ -133,5 +98,69 @@ fun MainScreen(
         }
 
 
+    }
+}
+
+@Composable
+fun ToggleableGameRecordList(
+    showRecords: Boolean,
+    animationDuration: Int,
+    navController: NavController
+){
+    AnimatedVisibility(
+        visible = showRecords,
+        enter = expandVertically(animationSpec = tween(durationMillis = animationDuration)),
+        exit = shrinkVertically(animationSpec = tween(durationMillis = animationDuration))
+    ) {
+        GameRecordsList(navController = navController)
+    }
+}
+
+@Composable
+fun MainControlButtons(
+    onToggleShowRecords :(Boolean) -> Unit,
+    navController: NavController
+){
+    Button(
+        shape = RoundedCornerShape(16.dp),
+        onClick = { navController.navigate("new_game") },
+        modifier = Modifier.fillMaxWidth()
+            .padding(horizontal = 16.dp)
+
+    ) {
+        Text("Start a New Game")
+    }
+
+    Spacer(modifier = Modifier.height(32.dp))
+
+    Button(
+        shape = RoundedCornerShape(16.dp),
+        onClick = { onToggleShowRecords(true)},
+        modifier = Modifier.fillMaxWidth()
+            .padding(horizontal = 16.dp)
+    ) {
+        Text("Load a Game")
+    }
+}
+
+@Composable
+fun ToggleableGamePic(
+    showRecords: Boolean,
+    animationDuration: Int
+){
+    AnimatedVisibility(
+        visible = !showRecords,
+        enter = expandVertically(animationSpec = tween(durationMillis = animationDuration)),
+        exit = shrinkVertically(animationSpec = tween(durationMillis = animationDuration))
+    ) {
+        Image(
+            painter = painterResource(id = R.drawable.game_pic),
+            contentDescription = "Game Logo",
+            contentScale = ContentScale.FillWidth,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+                .scale(1.4f)
+        )
     }
 }
